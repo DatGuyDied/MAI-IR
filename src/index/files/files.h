@@ -26,13 +26,13 @@ class TermsPosFile {
 public:
     TermsPosFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    int32_t get_term_pos(size_t i) {
+    int32_t get_term_pos(int32_t i) {
         std::ifstream terms_pos_file(index_dir / "terms_pos");
         terms_pos_file.seekg(sizeof(int32_t) * i);
         return biostream::read_int(terms_pos_file);
     }
 
-    int32_t get_term_size(size_t i) {
+    int32_t get_term_size(int32_t i) {
         std::ifstream terms_pos_file(index_dir / "terms_pos");
         terms_pos_file.seekg(sizeof(int32_t) * i);
 
@@ -49,7 +49,7 @@ class TermsFile {
 public:
     TermsFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    std::string get_term(size_t i) {
+    std::string get_term(int32_t i) {
         std::ifstream terms_file(index_dir / "terms");
         TermsPosFile terms_pos(index_dir);
 
@@ -76,13 +76,13 @@ class DocsPosFile {
 public:
     DocsPosFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    int32_t get_docs_pos(size_t i) {
+    int32_t get_docs_pos(int32_t i) {
         std::ifstream docs_pos_file(index_dir / "docs_pos");
         docs_pos_file.seekg(sizeof(int32_t) * i);
         return biostream::read_int(docs_pos_file);
     }
 
-    int32_t get_docs_size(size_t i) {
+    int32_t get_docs_size(int32_t i) {
         std::ifstream docs_pos_file(index_dir / "docs_pos");
         docs_pos_file.seekg(sizeof(int32_t) * i);
 
@@ -99,7 +99,7 @@ class DocsFile {
 public:
     DocsFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    std::vector<int32_t> get_docs(size_t i) {
+    std::vector<int32_t> get_docs(int32_t i) {
         std::ifstream docs_file(index_dir / "docs");
         DocsPosFile docs_pos(index_dir);
 
@@ -114,13 +114,13 @@ class DocsCoordsPosFile {
 public:
     DocsCoordsPosFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    int32_t get_docs_coords_pos(size_t i) {
+    int32_t get_docs_coords_pos(int32_t i) {
         std::ifstream docs_coords_pos_file(index_dir / "docs_coords_pos");
         docs_coords_pos_file.seekg(sizeof(int32_t) * i);
         return biostream::read_int(docs_coords_pos_file);
     }
 
-    int32_t get_docs_coords_size(size_t i) {
+    int32_t get_docs_coords_size(int32_t i) {
         std::ifstream docs_coords_pos_file(index_dir / "docs_coords_pos");
         docs_coords_pos_file.seekg(sizeof(int32_t) * i);
 
@@ -137,7 +137,7 @@ class CoordsPosFile {
 public:
     CoordsPosFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    std::vector<int32_t> get_coords_pos(size_t i) {
+    std::vector<int32_t> get_coords_pos(int32_t i) {
         std::ifstream coords_pos_file(index_dir / "coords_pos");
         DocsCoordsPosFile docs_coords_pos(index_dir);
 
@@ -148,7 +148,7 @@ public:
         return ret;
     }
 
-    std::vector<int32_t> get_coords_size(size_t i) {
+    std::vector<int32_t> get_coords_size(int32_t i) {
         std::ifstream coords_pos_file(index_dir / "coords_pos");
         DocsCoordsPosFile docs_coords_pos(index_dir);
 
@@ -157,19 +157,19 @@ public:
 
         std::vector<int32_t> size;
         size.reserve(pos.size());
-        for (size_t i = 1; i < pos.size(); i++) {
+        for (int32_t i = 1; i < pos.size(); i++) {
             size.push_back(pos[i] - pos[i - 1]);
         }
 
         return size;
     }
 
-    int32_t get_coords_pos(size_t i, size_t j) {
+    int32_t get_coords_pos(int32_t i, int32_t j) {
         std::vector<int32_t> coords_pos = get_coords_pos(i);
         return coords_pos[j];
     }
 
-    int32_t get_coords_size(size_t i, size_t j) {
+    int32_t get_coords_size(int32_t i, int32_t j) {
         std::vector<int32_t> coords_pos = get_coords_pos(i);
         return coords_pos[j + 1] - coords_pos[j];
     }
@@ -181,7 +181,7 @@ class CoordsFile {
 public:
     CoordsFile(const std::filesystem::path& dir) : index_dir(dir){};
 
-    std::vector<std::vector<int32_t>> get_coords(size_t i) {
+    std::vector<std::vector<int32_t>> get_coords(int32_t i) {
         std::ifstream coords_file(index_dir / "coords");
         CoordsPosFile coords_pos(index_dir);
 
@@ -191,7 +191,7 @@ public:
             size = coords_pos.get_coords_size(i);
 
 
-        for (size_t i = 0; i < pos.size(); i++) {
+        for (int32_t i = 0; i < pos.size(); i++) {
             coords_file.seekg(pos[i]);
             coords.push_back(biostream::read_vector(coords_file, size[i]));
         }
@@ -199,7 +199,7 @@ public:
         return coords;
     }
 
-    std::vector<int32_t> get_coords(size_t i, size_t j) {
+    std::vector<int32_t> get_coords(int32_t i, int32_t j) {
         auto coords = get_coords(i);
         return coords[j];
     }

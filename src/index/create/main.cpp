@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <fstream>
 #include "biostream/biostream.h"
-#include "index/files/files.h"
 
 using Inverted_index = std::map<std::string, std::map<int32_t, std::vector<int32_t>>>;
 
@@ -26,13 +25,15 @@ std::map<std::string, std::vector<int32_t>> split(const std::string& s) {
             if (token == "") 
                 continue;
 
-            ret[token].push_back(pos);
-            pos++;
+            ret[token].push_back(pos++);
             token = "";
             continue;
         }
 
         token += s[i];
+    }
+    if (token != "") {
+        ret[token].push_back(pos++);
     }
 
     return ret;
@@ -114,18 +115,6 @@ void create_inverted_index(const std::filesystem::path& input_path, const std::f
 
         for (auto [term, coords] : splited_content) {
             inverted_index[term][doc_id] = coords;
-        }
-    }
-
-    for (auto [term, mp] : inverted_index) {
-        std::cout << term << ":\n";
-        for (auto [doc_id, coords] : mp) {
-            std::cout << "\t" << doc_id << ":\n";
-
-            for (auto coord : coords) {
-                std::cout << "\t\t" << coord << ' ';
-            }
-            std::cout << std::endl;
         }
     }
 
