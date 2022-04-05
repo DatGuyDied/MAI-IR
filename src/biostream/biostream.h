@@ -37,10 +37,11 @@ void write_vector(std::ostream& os, const std::vector<int32_t>& a) {
 }
 
 std::vector<int32_t> read_vector(std::istream& is, int32_t n) {
+    n = n / sizeof(int32_t);
     std::vector<int32_t> a;
     a.reserve(n);
 
-    for (auto &it : a) {
+    for (size_t i = 0; i < n; i++) {
         a.push_back(read_int(is));
     }
 

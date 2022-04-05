@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include "biostream/biostream.h"
+#include "index/files/files.h"
 
 using Inverted_index = std::map<std::string, std::map<int32_t, std::vector<int32_t>>>;
 
@@ -86,8 +87,8 @@ void write_coords(const std::filesystem::path& output_path, Inverted_index index
         coords_file(output_path / "coords");
 
     biostream::write_int(docs_coords_pos_file, (int32_t) 0);
-    biostream::write_int(coords_file, (int32_t) 0);
     for (auto [term, docs_map] : index) {
+        biostream::write_int(coords_pos_file, (int32_t) coords_file.tellp());
         for (auto [doc_id, coords] : docs_map) {
             biostream::write_vector(coords_file, coords);
             biostream::write_int(coords_pos_file, (int32_t) coords_file.tellp());
@@ -100,8 +101,8 @@ void create_inverted_index(const std::filesystem::path& input_path, const std::f
     std::filesystem::create_directory(output_path);
     std::ifstream input_file(input_path);
     std::ofstream 
-        doc_count_file(output_path / "doc_count"),
-        term_count_file(output_path / "term_count");
+        doc_count_file(output_path / "docs_count"),
+        term_count_file(output_path / "terms_count");
 
     Inverted_index inverted_index;
 
@@ -113,6 +114,18 @@ void create_inverted_index(const std::filesystem::path& input_path, const std::f
 
         for (auto [term, coords] : splited_content) {
             inverted_index[term][doc_id] = coords;
+        }
+    }
+
+    for (auto [term, mp] : inverted_index) {
+        std::cout << term << ":\n";
+        for (auto [doc_id, coords] : mp) {
+            std::cout << "\t" << doc_id << ":\n";
+
+            for (auto coord : coords) {
+                std::cout << "\t\t" << coord << ' ';
+            }
+            std::cout << std::endl;
         }
     }
 
