@@ -205,6 +205,30 @@ public:
     }
 };
 
+class DBFile {
+    std::filesystem::path index_path;
+    std::vector<int32_t> pos;
+
+public:
+    DBFile(const std::filesystem::path& dir) : index_path(dir){
+        std::ifstream db_file(index_path / "db");
+
+        std::string str;
+        pos.push_back(0);
+        for (;std::getline(db_file, str);) {
+            pos.push_back(db_file.tellg());
+        }
+    };
+
+    std::string get_line(size_t i) {
+        std::ifstream db_file(index_path / "db");
+        db_file.seekg(pos[i]);
+        std::string line = biostream::read_string(db_file, pos[i + 1] - pos[i]);
+
+        return line;
+    }
+};
+
 } // namespace files
 
 #endif
